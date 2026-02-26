@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chakula — Kenyan Kitchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ──────────────────────────────────────────────────── */
+:root {
+  --bg: #0f0e0a; --surface: #1a1814; --card: #201e19; --border: #2e2b24;
+  --accent: #e8a838; --danger: #c0392b; --text: #f0ebe0; --muted: #8a8070;
+  --tag: #2a2720; --green: #6dc882;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+/* ── HEADER ──────────────────────────────────────────────────── */
+header {
+  padding: 0 2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: stretch; justify-content: space-between; gap: 1rem;
+  position: sticky; top: 0; background: var(--bg); z-index: 200;
+  height: 64px;
+}
+.logo {
+  font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 900;
+  color: var(--accent); letter-spacing: -1px; text-decoration: none;
+  display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0;
+}
+.logo-sub { color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 400; letter-spacing: 2.5px; text-transform: uppercase; }
+
+/* TAB NAV */
+.tab-nav { display: flex; align-items: stretch; gap: 0; margin-left: auto; }
+.tab-btn {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0 1.3rem; border: none; background: none; color: var(--muted);
+  font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer;
+  border-bottom: 2.5px solid transparent; transition: all 0.2s;
+  position: relative; top: 1px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-icon { font-size: 1rem; }
+
+/* HEADER RIGHT (search + filter, only in browse) */
+.header-tools {
+  display: flex; align-items: center; gap: 0.7rem;
+  transition: opacity 0.2s;
+}
+.header-tools.hidden { opacity: 0; pointer-events: none; }
+
+.search-wrap { position: relative; }
+.search-wrap input {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  padding: 0.55rem 0.9rem 0.55rem 2.3rem; border-radius: 8px;
+  font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; width: 240px;
+  transition: border-color 0.2s, width 0.25s;
+}
+.search-wrap input:focus { border-color: var(--accent); width: 280px; }
+.search-wrap input::placeholder { color: var(--muted); }
+.s-icon { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.85rem; pointer-events: none; }
+
+.btn {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  padding: 0.55rem 1rem; border-radius: 8px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  transition: all 0.2s; white-space: nowrap; text-decoration: none;
+}
+.btn:hover, .btn.active { border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #0f0e0a; font-weight: 600; }
+.btn-primary:hover { background: #d4952e; border-color: #d4952e; color: #0f0e0a; }
+.btn-danger { border-color: rgba(192,57,43,0.35); color: var(--danger); font-size: 0.78rem; }
+.btn-danger:hover { background: rgba(192,57,43,0.08); border-color: var(--danger); }
+
+/* ── VIEWS ────────────────────────────────────────────────────── */
+.view { display: none; animation: viewIn 0.25s ease; }
+.view.active { display: block; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   BROWSE VIEW
+═══════════════════════════════════════════════════════════════ */
+.ing-panel {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 1.2rem 2rem; display: none;
+}
+.ing-panel.open { display: block; animation: slideDown 0.22s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.ing-panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem; }
+.ing-panel-head h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
+.clr-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; }
+.chip-grid { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.chip {
+  background: var(--tag); border: 1px solid var(--border); color: var(--muted);
+  padding: 0.28rem 0.75rem; border-radius: 999px; font-size: 0.78rem;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip.on { background: var(--accent); border-color: var(--accent); color: #0f0e0a; font-weight: 500; }
+
+.browse-main { padding: 1.8rem 2rem; max-width: 1200px; margin: 0 auto; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 0.25rem; }
+.result-count { color: var(--muted); font-size: 0.8rem; margin-bottom: 1.4rem; }
+.result-count em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+.meal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)); gap: 1rem; }
+.meal-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  overflow: hidden; cursor: pointer; transition: all 0.22s;
+  animation: fadeIn 0.3s ease both;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.meal-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 28px rgba(232,168,56,0.1); }
+.meal-card.dim { opacity: 0.28; transform: none !important; box-shadow: none !important; border-color: var(--border) !important; }
+.card-em { font-size: 3.2rem; text-align: center; padding: 1.2rem 1rem 0.3rem; display: block; }
+.card-body { padding: 0.65rem 1.1rem 1.1rem; }
+.card-name { font-family: 'Playfair Display', serif; font-size: 1.08rem; font-weight: 700; margin-bottom: 0.22rem; }
+.card-desc { font-size: 0.77rem; color: var(--muted); margin-bottom: 0.7rem; line-height: 1.45; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tag { font-size: 0.68rem; color: var(--muted); background: var(--tag); padding: 0.18rem 0.48rem; border-radius: 4px; }
+.tag-match { font-size: 0.68rem; background: rgba(232,168,56,0.1); color: var(--accent); padding: 0.18rem 0.48rem; border-radius: 4px; border: 1px solid rgba(232,168,56,0.2); }
+.tag-user { font-size: 0.68rem; background: rgba(109,200,130,0.08); color: var(--green); padding: 0.18rem 0.48rem; border-radius: 4px; border: 1px solid rgba(109,200,130,0.18); }
+
+.no-results { text-align: center; padding: 5rem 2rem; color: var(--muted); }
+.no-results .nr-em { font-size: 3rem; margin-bottom: 0.8rem; }
+
+/* ── RECIPE MODAL ──────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 900;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 2rem 1rem; overflow-y: auto;
+  opacity: 0; pointer-events: none; transition: opacity 0.22s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  max-width: 620px; width: 100%; overflow: hidden; margin: auto;
+  transform: translateY(18px); transition: transform 0.22s;
+}
+.overlay.open .modal { transform: translateY(0); }
+.modal-hd { padding: 1.8rem 2rem 1rem; border-bottom: 1px solid var(--border); position: relative; }
+.modal-em { font-size: 2.8rem; display: block; margin-bottom: 0.4rem; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 900; }
+.modal-sub { color: var(--muted); font-size: 0.85rem; line-height: 1.5; margin-top: 0.25rem; }
+.modal-tags { display: flex; gap: 0.6rem; margin-top: 0.7rem; flex-wrap: wrap; }
+.modal-x { position: absolute; top: 1.1rem; right: 1.1rem; background: var(--card); border: 1px solid var(--border); color: var(--text); width: 1.9rem; height: 1.9rem; border-radius: 50%; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+.modal-x:hover { border-color: var(--accent); }
+.modal-bd { padding: 1.3rem 2rem 2rem; }
+.sec-lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 0.65rem; margin-top: 1.3rem; }
+.ing-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ing-chip { background: var(--tag); border: 1px solid var(--border); padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.8rem; }
+.ing-chip.have { border-color: rgba(232,168,56,0.38); color: var(--accent); background: rgba(232,168,56,0.07); }
+.steps { list-style: none; }
+.steps li { display: flex; gap: 0.85rem; margin-bottom: 0.9rem; align-items: flex-start; }
+.snum { background: var(--accent); color: #0f0e0a; font-weight: 700; font-size: 0.72rem; width: 1.4rem; height: 1.4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.stxt { font-size: 0.9rem; line-height: 1.65; }
+.src-note { margin-top: 1.3rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--muted); }
+.src-note a { color: var(--accent); }
+
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN VIEW
+═══════════════════════════════════════════════════════════════ */
+/* Login gate */
+.admin-gate {
+  min-height: calc(100vh - 64px); display: flex; align-items: center; justify-content: center; padding: 2rem;
+}
+.login-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 2.8rem 2.2rem; max-width: 340px; width: 100%; text-align: center;
+}
+.login-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--accent); margin-bottom: 0.25rem; }
+.login-sub { color: var(--muted); font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1.8rem; }
+.login-box input {
+  width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text);
+  padding: 0.75rem; border-radius: 8px; font-size: 0.95rem; font-family: 'DM Sans', sans-serif;
+  outline: none; text-align: center; letter-spacing: 3px; margin-bottom: 0.85rem; transition: border-color 0.2s;
+}
+.login-box input:focus { border-color: var(--accent); }
+.login-err { color: var(--danger); font-size: 0.8rem; margin-bottom: 0.7rem; display: none; }
+.login-hint { margin-top: 1rem; font-size: 0.73rem; color: var(--muted); line-height: 1.6; }
+.login-hint strong { color: var(--accent); }
+
+/* Admin panel body */
+.admin-body { display: none; }
+.admin-body.visible { display: block; animation: viewIn 0.25s ease; }
+
+.admin-layout {
+  display: grid; grid-template-columns: 1fr 360px; gap: 1.8rem;
+  padding: 1.8rem 2rem; max-width: 1200px; margin: 0 auto;
+}
+@media (max-width: 880px) { .admin-layout { grid-template-columns: 1fr; } }
+
+/* Form card */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.panel-hd { padding: 1.3rem 1.6rem; border-bottom: 1px solid var(--border); }
+.panel-hd h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; }
+.panel-hd p { color: var(--muted); font-size: 0.8rem; margin-top: 0.25rem; }
+.panel-bd { padding: 1.4rem 1.6rem 1.8rem; }
+
+.field { margin-bottom: 1.1rem; }
+.field label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 0.45rem; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text);
+  padding: 0.65rem 0.85rem; border-radius: 8px; font-size: 0.88rem;
+  font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; resize: vertical;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+.field select option { background: var(--card); }
+.field-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.35rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+
+.emoji-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.45rem; }
+.em-opt { font-size: 1.35rem; cursor: pointer; padding: 0.28rem; border-radius: 6px; border: 2px solid transparent; transition: all 0.13s; line-height: 1; }
+.em-opt:hover { background: var(--tag); }
+.em-opt.on { border-color: var(--accent); background: rgba(232,168,56,0.1); }
+
+.form-actions { display: flex; gap: 0.7rem; margin-top: 1.4rem; }
+
+/* Preview */
+.preview-wrap { margin-top: 1.6rem; border-top: 1px solid var(--border); padding-top: 1.3rem; display: none; }
+.preview-lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 0.8rem; }
+.preview-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem; }
+.preview-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 0.25rem; }
+.preview-desc { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.7rem; }
+.preview-ings { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.7rem; }
+.preview-ing { background: var(--tag); border: 1px solid var(--border); padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.76rem; }
+.preview-steps { list-style: none; }
+.preview-steps li { display: flex; gap: 0.65rem; margin-bottom: 0.5rem; font-size: 0.8rem; line-height: 1.5; }
+.pnum { background: var(--accent); color: #0f0e0a; font-weight: 700; font-size: 0.68rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+/* Recipe list sidebar */
+.recipe-list { max-height: 520px; overflow-y: auto; padding: 0.4rem; }
+.recipe-list::-webkit-scrollbar { width: 3px; }
+.recipe-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.r-item { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.9rem; border-radius: 8px; transition: background 0.15s; }
+.r-item:hover { background: var(--card); }
+.r-em { font-size: 1.5rem; flex-shrink: 0; }
+.r-info { flex: 1; min-width: 0; }
+.r-name { font-size: 0.87rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-meta { font-size: 0.72rem; color: var(--muted); margin-top: 0.08rem; }
+.r-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.82rem; padding: 0.28rem; border-radius: 4px; transition: all 0.13s; flex-shrink: 0; }
+.r-del:hover { color: var(--danger); background: rgba(192,57,43,0.08); }
+.empty-list { padding: 2.5rem 1rem; text-align: center; color: var(--muted); font-size: 0.83rem; }
+.empty-list .ee { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+.tips-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; margin-top: 1rem; font-size: 0.78rem; color: var(--muted); line-height: 1.65; }
+.tips-box strong { color: var(--text); display: block; margin-bottom: 0.4rem; }
+
+/* ── LOGOUT BAR ──────────────────────────────────────────────── */
+.admin-topbar { display: flex; justify-content: flex-end; padding: 0.8rem 2rem; border-bottom: 1px solid var(--border); }
+
+/* ── TOAST ────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--green); color: #0f0e0a; padding: 0.75rem 1.4rem;
+  border-radius: 999px; font-weight: 600; font-size: 0.87rem; z-index: 9999;
+  transition: transform 0.28s ease; white-space: nowrap; pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.err { background: var(--danger); color: #fff; }
+
+/* ── RESPONSIVE ───────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  header { padding: 0 1rem; }
+  .logo-sub { display: none; }
+  .search-wrap input { width: 140px; }
+  .search-wrap input:focus { width: 160px; }
+  .browse-main, .admin-layout { padding: 1rem; }
+  .tab-btn { padding: 0 0.8rem; font-size: 0.78rem; }
+  .modal-hd { padding: 1.4rem 1.2rem 0.8rem; }
+  .modal-bd { padding: 1rem 1.2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ═════════════════════════════════════════════════════ -->
+<header>
+  <div class="logo">Chakula <span class="logo-sub">Kenyan Kitchen</span></div>
+
+  <!-- Tab switcher -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="browse" onclick="switchTab('browse')">
+      <span class="tab-icon">🍽</span> Browse
+    </button>
+    <button class="tab-btn" data-tab="admin" onclick="switchTab('admin')">
+      <span class="tab-icon">⚙</span> Admin
+    </button>
+  </nav>
+
+  <!-- Search & filter — only relevant in browse -->
+  <div class="header-tools" id="headerTools">
+    <div class="search-wrap">
+      <span class="s-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search meals...">
+    </div>
+    <button class="btn" id="ingToggle">🥬 Ingredients</button>
+  </div>
+</header>
+
+<!-- ══ BROWSE VIEW ════════════════════════════════════════════════ -->
+<div class="view active" id="view-browse">
+
+  <!-- Ingredient filter panel -->
+  <div class="ing-panel" id="ingPanel">
+    <div class="ing-panel-head">
+      <h3>What do you have at home?</h3>
+      <button class="clr-btn" id="clearChips">Clear all</button>
+    </div>
+    <div class="chip-grid" id="chipGrid"></div>
+  </div>
+
+  <div class="browse-main">
+    <div class="section-title" id="sectionTitle">All Meals</div>
+    <div class="result-count" id="resultCount"></div>
+    <div class="meal-grid" id="mealGrid"></div>
+    <div class="no-results" id="noResults" style="display:none">
+      <div class="nr-em">🍳</div>
+      <p>No meals found. Try different search terms or ingredients.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN VIEW ═════════════════════════════════════════════════ -->
+<div class="view" id="view-admin">
+
+  <!-- LOGIN GATE -->
+  <div class="admin-gate" id="adminGate">
+    <div class="login-box">
+      <div class="login-logo">Chakula</div>
+      <div class="login-sub">Admin Access</div>
+      <div class="login-err" id="loginErr">Wrong password. Try again.</div>
+      <input type="password" id="pwInput" placeholder="Enter password">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="doLogin()">Enter →</button>
+      <p class="login-hint">Default password: <strong>chakula123</strong><br>Change it in the source code</p>
+    </div>
+  </div>
+
+  <!-- ADMIN BODY (hidden until logged in) -->
+  <div class="admin-body" id="adminBody">
+    <div class="admin-topbar">
+      <button class="btn btn-danger" onclick="doLogout()">Logout</button>
+    </div>
+
+    <div class="admin-layout">
+
+      <!-- FORM -->
+      <div class="panel">
+        <div class="panel-hd">
+          <h2>Add New Recipe</h2>
+          <p>Fill in the details below. Ingredients and steps go one per line.</p>
+        </div>
+        <div class="panel-bd">
+
+          <div class="field">
+            <label>Emoji</label>
+            <div class="emoji-grid" id="emojiGrid"></div>
+            <input type="text" id="emojiCustom" placeholder="Or type your own emoji" style="margin-top:0.5rem" maxlength="4">
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Meal Name *</label>
+              <input type="text" id="fName" placeholder="e.g. Matumbo na Ugali">
+            </div>
+            <div class="field">
+              <label>Category *</label>
+              <select id="fCategory">
+                <option value="">Select...</option>
+                <option>Staple</option><option>Stew</option><option>Rice dish</option>
+                <option>Bread</option><option>Grilled meat</option><option>Mash</option>
+                <option>Salad</option><option>Soup</option><option>Offal</option>
+                <option>Snack</option><option>Dessert</option><option>Drink</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Description *</label>
+            <input type="text" id="fDesc" placeholder="One sentence describing the dish">
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Cook Time</label>
+              <input type="text" id="fTime" placeholder="e.g. 45 min">
+            </div>
+            <div class="field">
+              <label>Serves</label>
+              <input type="text" id="fServes" placeholder="e.g. 4">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Ingredients *</label>
+            <textarea id="fIngredients" rows="5" placeholder="One ingredient per line:&#10;Unga wa mahindi&#10;Sukuma wiki&#10;Vitunguu&#10;Nyanya"></textarea>
+            <div class="field-hint">Use Swahili names where possible.</div>
+          </div>
+
+          <div class="field">
+            <label>Cooking Steps *</label>
+            <textarea id="fSteps" rows="6" placeholder="One step per line:&#10;Boil 3 cups of water with salt.&#10;Add unga slowly while stirring.&#10;Cook on low heat 15 minutes."></textarea>
+            <div class="field-hint">One action per step. Clear enough for a beginner.</div>
+          </div>
+
+          <div class="field">
+            <label>Source <span style="text-transform:none;letter-spacing:0;font-size:0.72rem">(optional)</span></label>
+            <input type="text" id="fSourceName" placeholder="e.g. Cookpad — Mama Njeri">
+            <input type="url" id="fSourceUrl" placeholder="https://cookpad.com/..." style="margin-top:0.5rem">
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="saveRecipe()">✓ Save Recipe</button>
+            <button class="btn" onclick="clearForm()">Clear</button>
+          </div>
+
+          <!-- LIVE PREVIEW -->
+          <div class="preview-wrap" id="previewWrap">
+            <div class="preview-lbl">Live Preview</div>
+            <div class="preview-card" id="previewCard"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SAVED LIST + TIPS -->
+      <div>
+        <div class="panel">
+          <div class="panel-hd" style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <h2>Your Recipes</h2>
+            </div>
+            <span style="font-size:0.78rem;color:var(--muted)"><em id="rCount" style="color:var(--accent);font-style:normal">0</em> saved</span>
+          </div>
+          <div class="recipe-list" id="recipeList"></div>
+        </div>
+
+        <div class="tips-box">
+          <strong>💡 Tips for great recipes</strong>
+          Use Swahili ingredient names people recognise (unga, sukuma, vitunguu).<br>
+          Keep steps short — one action per line.<br>
+          Mention amounts where helpful (2 cups, 3 nyanya).<br>
+          You can reference Cookpad but rewrite steps in your own words.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ RECIPE MODAL ═══════════════════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-hd">
+      <button class="modal-x" id="modalClose">✕</button>
+      <span class="modal-em" id="mEm"></span>
+      <div class="modal-title" id="mTitle"></div>
+      <div class="modal-sub" id="mSub"></div>
+      <div class="modal-tags" id="mTags"></div>
+    </div>
+    <div class="modal-bd">
+      <div class="sec-lbl">Ingredients</div>
+      <div class="ing-chips" id="mIngs"></div>
+      <div class="sec-lbl">How to Cook</div>
+      <ol class="steps" id="mSteps"></ol>
+      <div class="src-note" id="mSrc" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const ADMIN_PASSWORD = "chakula123";
+
+const BUILTIN = [
+  { id:"b1", name:"Ugali na Sukuma Wiki", emoji:"🫓", category:"Staple", time:"30 min", serves:"4",
+    desc:"The ultimate Kenyan comfort meal — stiff maize porridge with braised collard greens",
+    ingredients:["Unga wa mahindi","Sukuma wiki","Vitunguu","Nyanya","Mafuta ya kupikia","Coriander"],
+    steps:["Bring 3 cups of water to a boil in a heavy pot. Add a pinch of salt.","Slowly add 2 cups unga wa mahindi, stirring constantly to avoid lumps.","Reduce heat and turn ugali firmly for 10–15 mins until it pulls from the pot sides. Rest 5 mins covered.","Heat oil in a pan. Fry vitunguu golden, add nyanya and cook until soft.","Add sukuma wiki (sliced thin), splash of water, cover and steam 5 minutes.","Season with salt, add coriander. Serve hot alongside ugali."]
+  },
+  { id:"b2", name:"Pilau", emoji:"🍚", category:"Rice dish", time:"60 min", serves:"6",
+    desc:"Fragrant spiced rice slow-cooked with meat — a celebration dish from the Coast",
+    ingredients:["Mchele","Nyama ya ng'ombe","Vitunguu","Vitunguu saumu","Tangawizi","Bizari","Garam masala","Nyanya","Mafuta ya kupikia","Coriander"],
+    steps:["Wash and soak mchele 20 minutes. Drain.","Fry sliced vitunguu in oil until deep brown — this gives pilau its color.","Add vitunguu saumu and tangawizi paste, fry 2 mins. Add bizari and garam masala, stir 1 min.","Add nyama, brown on all sides. Add nyanya, cook until sauce thickens.","Add 3 cups water, bring to boil, season with salt.","Add mchele, stir once, cover tightly, cook 20 mins on very low heat.","Rest covered 5 mins. Garnish with coriander."]
+  },
+  { id:"b3", name:"Githeri", emoji:"🫘", category:"Stew", time:"90 min", serves:"5",
+    desc:"Boiled maize and beans — simple, filling, and nutritious. A true Kenyan classic",
+    ingredients:["Maharagwe","Ngano","Vitunguu","Nyanya","Mafuta ya kupikia","Vitunguu saumu","Coriander","Pilipili"],
+    steps:["Soak maharagwe and ngano separately overnight. Drain.","Boil maharagwe 30 mins. Add ngano, boil until both are tender (~40 more mins). Drain, reserve stock.","Heat oil, fry vitunguu soft. Add vitunguu saumu and nyanya, cook into a thick sauce.","Add boiled githeri and some reserved stock. Simmer 10 minutes.","Season with salt and pilipili. Garnish with coriander."]
+  },
+  { id:"b4", name:"Mukimo", emoji:"🟢", category:"Mash", time:"45 min", serves:"4",
+    desc:"Creamy green mash of potatoes, peas, corn and spinach — a Kikuyu specialty",
+    ingredients:["Viazi","Mbaazi","Ngano","Spinachi","Vitunguu","Siagi"],
+    steps:["Boil viazi, mbaazi, and ngano in salted water until very soft (~25 mins).","Add spinachi last 5 minutes to wilt.","Drain. Mash everything together while hot.","Add siagi and a splash of milk. Mash until smooth and green.","Fry vitunguu until caramelized, stir into mash. Season well."]
+  },
+  { id:"b5", name:"Chapati", emoji:"🫓", category:"Bread", time:"40 min", serves:"6",
+    desc:"Soft, layered flatbread — a Kenyan staple for celebrations and everyday meals",
+    ingredients:["Unga wa ngano","Mafuta ya kupikia","Siagi"],
+    steps:["Mix unga with salt. Add warm water gradually, knead into smooth soft dough.","Rest dough covered 20 minutes.","Divide into balls. Roll flat, brush with oil. Roll into a log, coil into a spiral, re-roll flat.","Cook on dry hot pan 1–2 mins per side until brown spots appear.","Brush with siagi while cooking. Keep warm in a cloth."]
+  },
+  { id:"b6", name:"Nyama Choma", emoji:"🍖", category:"Grilled meat", time:"90 min", serves:"4",
+    desc:"Fire-roasted meat — Kenya's national dish, best eaten with bare hands",
+    ingredients:["Nyama ya ng'ombe","Vitunguu","Nyanya","Pilipili","Coriander","Tangawizi","Vitunguu saumu"],
+    steps:["Season meat with salt, pilipili, and lemon. Marinate at least 30 minutes.","Light charcoal, wait for white-hot embers — no open flame.","Grill meat, turning every 10 minutes. Don't press it down.","Cook 45–60 minutes until charred outside and cooked through.","Make kachumbari: dice nyanya and vitunguu, add pilipili, coriander and lemon juice.","Serve with kachumbari and ugali. Pull apart with hands."]
+  },
+  { id:"b7", name:"Maharagwe ya Nazi", emoji:"🥥", category:"Stew", time:"60 min", serves:"4",
+    desc:"Creamy coconut bean stew — a coastal classic that is rich, fragrant and comforting",
+    ingredients:["Maharagwe","Coconut milk","Vitunguu","Nyanya","Vitunguu saumu","Tangawizi","Bizari","Mafuta ya kupikia","Coriander"],
+    steps:["Soak maharagwe overnight. Boil until tender (~45 mins). Drain.","Heat oil, fry vitunguu soft. Add vitunguu saumu, tangawizi, and bizari.","Add nyanya, cook until soft. Add maharagwe, stir.","Pour in coconut milk, simmer 15 minutes until sauce thickens.","Season, garnish with coriander. Serve with chapati or rice."]
+  },
+  { id:"b8", name:"Dengu", emoji:"🟡", category:"Stew", time:"40 min", serves:"4",
+    desc:"Lentil stew cooked with spices and coconut — simple, fast, and deeply satisfying",
+    ingredients:["Dengu","Vitunguu","Nyanya","Vitunguu saumu","Tangawizi","Coconut milk","Mafuta ya kupikia","Coriander","Bizari"],
+    steps:["Wash and soak dengu 20 minutes. Boil until soft (~20 mins).","Heat oil, fry vitunguu golden. Add vitunguu saumu, tangawizi, and bizari.","Add nyanya, cook into sauce. Add dengu, stir.","Pour in coconut milk, simmer 10 minutes. Season.","Garnish with coriander. Serve with chapati, rice, or ugali."]
+  },
+  { id:"b9", name:"Kachumbari", emoji:"🥗", category:"Salad", time:"10 min", serves:"4",
+    desc:"Fresh tomato and onion salad — the simplest and most refreshing Kenyan side dish",
+    ingredients:["Nyanya","Vitunguu","Pilipili","Coriander"],
+    steps:["Dice nyanya into small cubes. Slice vitunguu very thinly.","Soak vitunguu slices in cold salted water 5 minutes. Drain.","Combine nyanya and vitunguu. Add finely chopped pilipili.","Add fresh coriander and a squeeze of lemon. Season with salt.","Mix gently, taste, adjust. Serve immediately."]
+  },
+  { id:"b10", name:"Ugali ya Wimbi", emoji:"🌾", category:"Staple", time:"25 min", serves:"4",
+    desc:"Dark, nutty finger millet ugali — a nutrient-dense traditional alternative",
+    ingredients:["Wimbi","Sukuma wiki","Mafuta ya kupikia","Vitunguu","Nyanya"],
+    steps:["Bring 2.5 cups water to boil. Mix 2 cups wimbi flour with cold water into a paste.","Pour paste into boiling water, stirring quickly and continuously.","Stir on low heat 15 minutes — wimbi ugali is denser than maize ugali.","Ready when it comes away from pot sides cleanly.","Serve with sukuma wiki stew or sour milk (mala)."]
+  }
+];
+
+const ALL_INGREDIENTS = [
+  "Unga wa mahindi","Unga wa ngano","Mchele","Ngano","Viazi",
+  "Nyanya","Vitunguu","Pilipili hoho","Nyama ya ng'ombe","Nyama ya kuku",
+  "Samaki","Mayai","Maharagwe","Mbaazi","Dengu","Wimbi",
+  "Sukuma wiki","Spinachi","Kabichi","Karoti","Coconut milk",
+  "Siagi","Mafuta ya kupikia","Vitunguu saumu","Tangawizi",
+  "Pilipili","Bizari","Garam masala","Coriander","Avocado"
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let activeTab = "browse";
+let selectedIngs = new Set();
+let searchQ = "";
+let selectedEmoji = "🍽";
+
+const EMOJIS = ["🍚","🫓","🥘","🍖","🥗","🫘","🥥","🟢","🟡","🌾","🐟","🥩","🍳","🫕","🌽","🥬","🍲","🫙"];
+
+// ═══════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + tab));
+  document.getElementById("headerTools").classList.toggle("hidden", tab !== "browse");
+
+  if (tab === "admin") {
+    const authed = sessionStorage.getItem("chakula_admin");
+    document.getElementById("adminGate").style.display = authed ? "none" : "flex";
+    document.getElementById("adminBody").classList.toggle("visible", !!authed);
+    if (authed) loadRecipeList();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BROWSE
+// ═══════════════════════════════════════════════════════════════
+// Build ingredient chips
+const chipGrid = document.getElementById("chipGrid");
+ALL_INGREDIENTS.forEach(ing => {
+  const c = document.createElement("div");
+  c.className = "chip"; c.textContent = ing;
+  c.addEventListener("click", () => {
+    selectedIngs.has(ing) ? (selectedIngs.delete(ing), c.classList.remove("on"))
+                           : (selectedIngs.add(ing), c.classList.add("on"));
+    renderMeals();
+  });
+  chipGrid.appendChild(c);
+});
+
+document.getElementById("ingToggle").addEventListener("click", function() {
+  document.getElementById("ingPanel").classList.toggle("open");
+  this.classList.toggle("active");
+});
+
+document.getElementById("clearChips").addEventListener("click", () => {
+  selectedIngs.clear();
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("on"));
+  renderMeals();
+});
+
+document.getElementById("searchInput").addEventListener("input", function() {
+  searchQ = this.value.toLowerCase().trim();
+  renderMeals();
+});
+
+function getUserMeals() {
+  try { return JSON.parse(localStorage.getItem("chakula_meals") || "[]"); } catch { return []; }
+}
+
+function score(meal) {
+  if (!selectedIngs.size) return { n: meal.ingredients.length, have: [], miss: [] };
+  const have = meal.ingredients.filter(i =>
+    [...selectedIngs].some(s => i.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(i.toLowerCase().split(" ")[0]))
+  );
+  return { n: have.length, have, miss: meal.ingredients.filter(i => !have.includes(i)) };
+}
+
+function renderMeals() {
+  const grid = document.getElementById("mealGrid");
+  const noRes = document.getElementById("noResults");
+  const cnt = document.getElementById("resultCount");
+  const title = document.getElementById("sectionTitle");
+  const hasF = selectedIngs.size > 0;
+  const userIds = new Set(getUserMeals().map(m => m.id));
+
+  let meals = [...BUILTIN, ...getUserMeals()].filter(m => {
+    if (!searchQ) return true;
+    return m.name.toLowerCase().includes(searchQ) ||
+           m.desc.toLowerCase().includes(searchQ) ||
+           m.category.toLowerCase().includes(searchQ) ||
+           m.ingredients.some(i => i.toLowerCase().includes(searchQ));
+  });
+
+  if (hasF) { meals.sort((a,b) => score(b).n - score(a).n); title.textContent = "Meals you can cook"; }
+  else title.textContent = searchQ ? `Results for "${searchQ}"` : "All Meals";
+
+  grid.innerHTML = "";
+  if (!meals.length) { noRes.style.display = "block"; cnt.textContent = ""; return; }
+  noRes.style.display = "none";
+
+  const perfect = hasF ? meals.filter(m => !score(m).miss.length).length : meals.length;
+  const userCount = meals.filter(m => userIds.has(m.id)).length;
+
+  cnt.innerHTML = hasF
+    ? `<em>${perfect}</em> full matches · <em>${meals.length}</em> total`
+    : `<em>${meals.length}</em> meals${userCount ? ` · <em>${userCount}</em> added by you` : ""}`;
+
+  meals.forEach((meal, idx) => {
+    const { n, have, miss } = score(meal);
+    const isUser = userIds.has(meal.id);
+    const card = document.createElement("div");
+    card.className = "meal-card" + (hasF && n === 0 ? " dim" : "");
+    card.style.animationDelay = (idx * 0.03) + "s";
+
+    let badges = "";
+    if (hasF) {
+      if (!miss.length) badges += `<span class="tag-match">✓ Full match</span>`;
+      else if (n > 0) badges += `<span class="tag-match">Missing ${miss.length}</span>`;
+    }
+    if (isUser) badges += `<span class="tag-user">✦ Yours</span>`;
+
+    card.innerHTML = `
+      <span class="card-em">${meal.emoji}</span>
+      <div class="card-body">
+        <div class="card-name">${meal.name}</div>
+        <div class="card-desc">${meal.desc}</div>
+        <div class="card-tags">
+          <span class="tag">⏱ ${meal.time}</span>
+          <span class="tag">👥 ${meal.serves}</span>
+          <span class="tag">${meal.category}</span>
+          ${badges}
+        </div>
+      </div>`;
+    card.addEventListener("click", () => openModal(meal, have));
+    grid.appendChild(card);
+  });
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(meal, haveList = []) {
+  document.getElementById("mEm").textContent = meal.emoji;
+  document.getElementById("mTitle").textContent = meal.name;
+  document.getElementById("mSub").textContent = meal.desc;
+  document.getElementById("mTags").innerHTML =
+    `<span class="tag">⏱ ${meal.time}</span><span class="tag">👥 Serves ${meal.serves}</span><span class="tag">${meal.category}</span>`;
+  document.getElementById("mIngs").innerHTML =
+    meal.ingredients.map(i => `<span class="ing-chip ${haveList.includes(i) ? "have" : ""}">${haveList.includes(i) ? "✓ " : ""}${i}</span>`).join("");
+  document.getElementById("mSteps").innerHTML =
+    meal.steps.map((s,i) => `<li><span class="snum">${i+1}</span><span class="stxt">${s}</span></li>`).join("");
+  const src = document.getElementById("mSrc");
+  if (meal.source) { src.innerHTML = `📖 Source: <a href="${meal.source}" target="_blank">${meal.sourceName || meal.source}</a>`; src.style.display = "block"; }
+  else src.style.display = "none";
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+function closeModal() { document.getElementById("overlay").classList.remove("open"); document.body.style.overflow = ""; }
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════════════════
+document.getElementById("pwInput").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+
+function doLogin() {
+  if (document.getElementById("pwInput").value === ADMIN_PASSWORD) {
+    sessionStorage.setItem("chakula_admin", "1");
+    document.getElementById("loginErr").style.display = "none";
+    document.getElementById("adminGate").style.display = "none";
+    document.getElementById("adminBody").classList.add("visible");
+    loadRecipeList();
+    setupPreview();
+  } else {
+    document.getElementById("loginErr").style.display = "block";
+    document.getElementById("pwInput").value = "";
+    document.getElementById("pwInput").focus();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem("chakula_admin");
+  document.getElementById("adminBody").classList.remove("visible");
+  document.getElementById("adminGate").style.display = "flex";
+  document.getElementById("pwInput").value = "";
+}
+
+// Emoji grid
+const emojiGrid = document.getElementById("emojiGrid");
+EMOJIS.forEach((em, i) => {
+  const btn = document.createElement("span");
+  btn.className = "em-opt" + (i === 0 ? " on" : "");
+  btn.textContent = em;
+  if (i === 0) selectedEmoji = em;
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".em-opt").forEach(b => b.classList.remove("on"));
+    btn.classList.add("on");
+    selectedEmoji = em;
+    document.getElementById("emojiCustom").value = "";
+    updatePreview();
+  });
+  emojiGrid.appendChild(btn);
+});
+
+document.getElementById("emojiCustom").addEventListener("input", function() {
+  if (this.value.trim()) {
+    selectedEmoji = this.value.trim();
+    document.querySelectorAll(".em-opt").forEach(b => b.classList.remove("on"));
+    updatePreview();
+  }
+});
+
+let previewSetup = false;
+function setupPreview() {
+  if (previewSetup) return;
+  previewSetup = true;
+  ["fName","fDesc","fIngredients","fSteps","fCategory","fTime","fServes"].forEach(id => {
+    document.getElementById(id).addEventListener("input", updatePreview);
+  });
+}
+
+function updatePreview() {
+  const name = document.getElementById("fName").value.trim();
+  const desc = document.getElementById("fDesc").value.trim();
+  const ings = document.getElementById("fIngredients").value.trim().split("\n").filter(Boolean);
+  const steps = document.getElementById("fSteps").value.trim().split("\n").filter(Boolean);
+  const wrap = document.getElementById("previewWrap");
+  if (!name && !desc) { wrap.style.display = "none"; return; }
+  wrap.style.display = "block";
+  document.getElementById("previewCard").innerHTML = `
+    <div style="font-size:2rem;margin-bottom:0.4rem">${selectedEmoji}</div>
+    <div class="preview-title">${name || "Recipe Name"}</div>
+    <div class="preview-desc">${desc || "Description..."}</div>
+    ${ings.length ? `<div class="preview-ings">${ings.map(i=>`<span class="preview-ing">${i}</span>`).join("")}</div>` : ""}
+    ${steps.length ? `<ol class="preview-steps">${steps.map((s,i)=>`<li><span class="pnum">${i+1}</span>${s}</li>`).join("")}</ol>` : ""}
+  `;
+}
+
+function saveRecipe() {
+  const name = document.getElementById("fName").value.trim();
+  const desc = document.getElementById("fDesc").value.trim();
+  const cat  = document.getElementById("fCategory").value;
+  const time = document.getElementById("fTime").value.trim() || "?";
+  const serves = document.getElementById("fServes").value.trim() || "?";
+  const ings = document.getElementById("fIngredients").value.trim().split("\n").filter(Boolean);
+  const steps = document.getElementById("fSteps").value.trim().split("\n").filter(Boolean);
+  const srcName = document.getElementById("fSourceName").value.trim();
+  const srcUrl  = document.getElementById("fSourceUrl").value.trim();
+
+  if (!name) return toast("Please add a meal name", true);
+  if (!desc) return toast("Please add a description", true);
+  if (!cat)  return toast("Please select a category", true);
+  if (ings.length < 2) return toast("Add at least 2 ingredients", true);
+  if (steps.length < 2) return toast("Add at least 2 steps", true);
+
+  const meal = { id:"u_"+Date.now(), name, desc, category:cat, time, serves, emoji:selectedEmoji, ingredients:ings, steps, sourceName:srcName||null, source:srcUrl||null };
+  const saved = getUserMeals();
+  saved.push(meal);
+  localStorage.setItem("chakula_meals", JSON.stringify(saved));
+  toast(`✓ "${name}" saved!`);
+  clearForm();
+  loadRecipeList();
+  renderMeals(); // refresh browse view immediately
+}
+
+function loadRecipeList() {
+  const meals = getUserMeals();
+  const list = document.getElementById("recipeList");
+  document.getElementById("rCount").textContent = meals.length;
+
+  if (!meals.length) {
+    list.innerHTML = `<div class="empty-list"><div class="ee">📭</div>No recipes yet.<br>Add your first one!</div>`;
+    return;
+  }
+  list.innerHTML = meals.slice().reverse().map(m => `
+    <div class="r-item">
+      <span class="r-em">${m.emoji}</span>
+      <div class="r-info">
+        <div class="r-name">${m.name}</div>
+        <div class="r-meta">${m.category} · ${m.ingredients.length} ingredients · ${m.steps.length} steps</div>
+      </div>
+      <button class="r-del" onclick="deleteRecipe('${m.id}')" title="Delete">🗑</button>
+    </div>
+  `).join("");
+}
+
+function deleteRecipe(id) {
+  if (!confirm("Delete this recipe?")) return;
+  localStorage.setItem("chakula_meals", JSON.stringify(getUserMeals().filter(m => m.id !== id)));
+  loadRecipeList();
+  renderMeals();
+  toast("Recipe deleted");
+}
+
+function clearForm() {
+  ["fName","fDesc","fTime","fServes","fIngredients","fSteps","fSourceName","fSourceUrl","emojiCustom"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("fCategory").value = "";
+  document.querySelectorAll(".em-opt").forEach((b,i) => b.classList.toggle("on", i===0));
+  selectedEmoji = EMOJIS[0];
+  document.getElementById("previewWrap").style.display = "none";
+}
+
+function toast(msg, isErr = false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast" + (isErr ? " err" : "");
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+renderMeals();
+</script>
+</body>
+</html>
