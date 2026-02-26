@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Bachelor's Dish — Cook what you have. Eat well anyway.</title>
+<meta name="description" content="Simple Kenyan recipes for everyday cooking. Find meals based on what you already have at home.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────── */
+:root {
+  --bg: #0c0b08;
+  --bg2: #131108;
+  --surface: #1b1910;
+  --card: #211f14;
+  --border: #2d2b1c;
+  --border2: #3a3822;
+  --accent: #d4a843;
+  --accent2: #b8892e;
+  --warm: #e8c070;
+  --text: #f2ead8;
+  --muted: #8a8268;
+  --faint: #4a4835;
+  --danger: #b5392a;
+  --green: #5a9e6f;
+  --tag: #262411;
+  --hero-grad: linear-gradient(160deg, #1a1608 0%, #0c0b08 60%);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── NAV ─────────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 60px;
+  background: rgba(12,11,8,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+nav.scrolled { border-bottom-color: var(--border); }
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem; font-weight: 700;
+  color: var(--warm); letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.nav-links { display: flex; align-items: center; gap: 0.2rem; }
+.nav-link {
+  background: none; border: none; color: var(--muted);
+  font-family: 'Outfit', sans-serif; font-size: 0.82rem;
+  padding: 0.5rem 0.9rem; border-radius: 6px;
+  cursor: pointer; transition: all 0.18s; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.35rem;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.nav-link.active { color: var(--accent); }
+
+.nav-search-wrap {
+  position: relative;
+  transition: all 0.2s;
+}
+.nav-search-wrap input {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); padding: 0.5rem 1rem 0.5rem 2.2rem;
+  border-radius: 999px; font-size: 0.82rem; font-family: 'Outfit', sans-serif;
+  outline: none; width: 200px; transition: all 0.22s;
+}
+.nav-search-wrap input:focus { border-color: var(--accent); width: 240px; }
+.nav-search-wrap input::placeholder { color: var(--muted); }
+.nav-s-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.8rem; pointer-events: none; }
+
+.ham {
+  display: none; background: none; border: none; color: var(--text);
+  font-size: 1.3rem; cursor: pointer; padding: 0.3rem;
+}
+
+/* ── HERO ─────────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 6rem 2rem 4rem;
+  position: relative; overflow: hidden;
+  background: var(--hero-grad);
+}
+
+.hero-bg {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+
+.hero-bg::before {
+  content: '';
+  position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(212,168,67,0.07) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-bg::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+  background: linear-gradient(to top, var(--bg), transparent);
+}
+
+.hero-grain {
+  position: absolute; inset: 0; opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 128px;
+}
+
+.hero-eyebrow {
+  font-size: 0.72rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 1.2rem; font-weight: 500;
+  animation: fadeUp 0.7s ease both;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 700; line-height: 1.05;
+  color: var(--text); margin-bottom: 1.2rem;
+  animation: fadeUp 0.7s 0.1s ease both;
+}
+
+.hero-title em {
+  font-style: italic; color: var(--warm);
+}
+
+.hero-tagline {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--muted); font-weight: 300; margin-bottom: 2.8rem;
+  max-width: 480px;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+
+.hero-actions {
+  display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+  animation: fadeUp 0.7s 0.3s ease both;
+}
+
+.btn-hero {
+  background: var(--accent); color: #0c0b08;
+  border: none; padding: 0.9rem 2rem;
+  border-radius: 999px; font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; letter-spacing: 0.3px;
+}
+.btn-hero:hover { background: var(--warm); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,168,67,0.25); }
+
+.btn-hero-ghost {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border2); padding: 0.9rem 2rem;
+  border-radius: 999px; font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-hero-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+.hero-stats {
+  display: flex; gap: 3rem; margin-top: 4rem; justify-content: center;
+  animation: fadeUp 0.7s 0.4s ease both;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem; font-weight: 700; color: var(--warm); line-height: 1;
+}
+.stat-lbl { font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; margin-top: 0.3rem; text-transform: uppercase; }
+
+.scroll-hint {
+  position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+  color: var(--faint); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
+  animation: bounce 2s infinite;
+}
+@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── SECTION SHARED ──────────────────────────────────────────── */
+.section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+.section-eyebrow { font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 0.7rem; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; margin-bottom: 1rem; line-height: 1.15; }
+.section-sub { color: var(--muted); font-size: 0.95rem; line-height: 1.7; max-width: 560px; }
+
+/* ── INGREDIENT FILTER STRIP ─────────────────────────────────── */
+.filter-strip {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+}
+.filter-strip.open { max-height: 300px; padding: 1.2rem 2rem; }
+.filter-inner { max-width: 1200px; margin: 0 auto; }
+.filter-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+.filter-head h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
+.clr-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.78rem; font-family: 'Outfit', sans-serif; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip {
+  background: var(--tag); border: 1px solid var(--border);
+  color: var(--muted); padding: 0.28rem 0.75rem;
+  border-radius: 999px; font-size: 0.77rem; cursor: pointer;
+  transition: all 0.14s; user-select: none;
+}
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip.on { background: var(--accent); border-color: var(--accent); color: #0c0b08; font-weight: 500; }
+
+/* ── MEALS SECTION ───────────────────────────────────────────── */
+#meals-section {
+  padding-top: 4rem; padding-bottom: 5rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.meals-controls {
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 2rem 2rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+
+.meals-left h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; }
+.meals-left p { color: var(--muted); font-size: 0.82rem; margin-top: 0.2rem; }
+.meals-left p em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+.meals-right { display: flex; gap: 0.6rem; align-items: center; }
+
+.btn-filter {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); padding: 0.6rem 1.1rem; border-radius: 8px;
+  cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 0.82rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  transition: all 0.18s; white-space: nowrap;
+}
+.btn-filter:hover, .btn-filter.active { border-color: var(--accent); color: var(--accent); }
+
+.meal-grid {
+  max-width: 1200px; margin: 0 auto; padding: 0 2rem;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;
+}
+
+.meal-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden; cursor: pointer;
+  transition: all 0.22s;
+  animation: cardIn 0.4s ease both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.meal-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 36px rgba(212,168,67,0.1); }
+.meal-card.dim { opacity: 0.22; transform: none !important; box-shadow: none !important; border-color: var(--border) !important; pointer-events: none; }
+
+.card-top {
+  background: linear-gradient(135deg, #1e1c0e, #252310);
+  padding: 1.5rem 1rem 0.8rem; text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.card-em { font-size: 3rem; display: block; }
+.card-body { padding: 0.9rem 1.2rem 1.1rem; }
+.card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.22rem; line-height: 1.2; }
+.card-desc { font-size: 0.77rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.5; }
+.card-foot { display: flex; flex-wrap: wrap; gap: 0.38rem; }
+.ctag { font-size: 0.67rem; color: var(--muted); background: var(--tag); padding: 0.18rem 0.5rem; border-radius: 4px; }
+.ctag-match { font-size: 0.67rem; background: rgba(212,168,67,0.1); color: var(--accent); padding: 0.18rem 0.5rem; border-radius: 4px; border: 1px solid rgba(212,168,67,0.2); }
+.ctag-user { font-size: 0.67rem; background: rgba(90,158,111,0.08); color: var(--green); padding: 0.18rem 0.5rem; border-radius: 4px; border: 1px solid rgba(90,158,111,0.18); }
+
+.no-results { text-align: center; padding: 5rem 2rem; color: var(--muted); }
+.no-results .nr-big { font-size: 3rem; margin-bottom: 0.8rem; }
+
+/* ── ABOUT SECTION ───────────────────────────────────────────── */
+#about-section {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+}
+@media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; gap: 2.5rem; } }
+
+.about-visual {
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+
+.about-ring {
+  width: 280px; height: 280px; border-radius: 50%;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.about-ring::before {
+  content: '';
+  position: absolute; inset: 12px; border-radius: 50%;
+  border: 1px solid var(--border);
+  background: radial-gradient(circle, rgba(212,168,67,0.05) 0%, transparent 70%);
+}
+.about-center-em { font-size: 5rem; position: relative; z-index: 1; }
+
+.about-float {
+  position: absolute; background: var(--card); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 0.6rem 0.9rem;
+  font-size: 0.78rem; font-weight: 500; color: var(--text);
+  white-space: nowrap;
+}
+.af1 { top: 10%; right: -10%; }
+.af2 { bottom: 15%; left: -12%; }
+.af3 { top: 55%; right: -15%; font-size: 0.72rem; color: var(--muted); }
+
+.about-text .section-sub { margin-bottom: 2rem; }
+
+.about-points { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+.about-points li { display: flex; gap: 0.9rem; align-items: flex-start; }
+.ap-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+.ap-text { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+.ap-text strong { color: var(--text); display: block; font-size: 0.9rem; margin-bottom: 0.15rem; }
+
+/* ── MODAL ───────────────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 900;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 3rem 1rem; overflow-y: auto;
+  opacity: 0; pointer-events: none; transition: opacity 0.22s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 20px; max-width: 600px; width: 100%;
+  overflow: hidden; margin: auto;
+  transform: translateY(20px) scale(0.98); transition: transform 0.25s;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+.overlay.open .modal { transform: translateY(0) scale(1); }
+
+.modal-hd {
+  background: linear-gradient(135deg, #1e1c0e, #201e0e);
+  padding: 2rem 2rem 1.2rem; border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.modal-em { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; font-weight: 700; line-height: 1.1; }
+.modal-sub { color: var(--muted); font-size: 0.85rem; line-height: 1.55; margin-top: 0.3rem; }
+.modal-tags { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+.modal-x {
+  position: absolute; top: 1.2rem; right: 1.2rem;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+  color: var(--muted); width: 2rem; height: 2rem; border-radius: 50%;
+  cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.modal-x:hover { color: var(--text); border-color: var(--border2); }
+
+.modal-bd { padding: 1.5rem 2rem 2rem; }
+.sec-lbl { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--accent); margin-bottom: 0.65rem; margin-top: 1.4rem; }
+.ing-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ing-pill { background: var(--tag); border: 1px solid var(--border); padding: 0.27rem 0.7rem; border-radius: 6px; font-size: 0.8rem; }
+.ing-pill.have { border-color: rgba(212,168,67,0.4); color: var(--accent); background: rgba(212,168,67,0.07); }
+.steps { list-style: none; }
+.steps li { display: flex; gap: 0.9rem; margin-bottom: 0.95rem; align-items: flex-start; }
+.snum { background: var(--accent); color: #0c0b08; font-weight: 600; font-size: 0.72rem; width: 1.45rem; height: 1.45rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.stxt { font-size: 0.9rem; line-height: 1.65; color: var(--text); }
+.src-note { margin-top: 1.3rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.77rem; color: var(--muted); }
+.src-note a { color: var(--accent); text-decoration: none; }
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+footer {
+  background: var(--bg); border-top: 1px solid var(--border);
+  padding: 3rem 2rem; text-align: center;
+}
+.footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: var(--warm); margin-bottom: 0.5rem; }
+.footer-tag { font-size: 0.8rem; color: var(--muted); margin-bottom: 1.5rem; font-style: italic; }
+.footer-note { font-size: 0.75rem; color: var(--faint); line-height: 1.7; }
+
+/* ── ADMIN (hidden, URL-triggered) ───────────────────────────── */
+.admin-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 999;
+  display: flex; align-items: center; justify-content: center; padding: 2rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.admin-overlay.open { opacity: 1; pointer-events: all; }
+
+.admin-panel {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 20px; width: 100%; max-width: 960px; max-height: 90vh;
+  overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  transform: scale(0.97); transition: transform 0.25s;
+}
+.admin-overlay.open .admin-panel { transform: scale(1); }
+
+.admin-hd {
+  padding: 1.5rem 2rem; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.admin-hd h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; }
+
+.admin-inner { display: grid; grid-template-columns: 1fr 320px; gap: 0; }
+@media (max-width: 780px) { .admin-inner { grid-template-columns: 1fr; } }
+
+.admin-form { padding: 1.5rem 2rem 2rem; border-right: 1px solid var(--border); }
+.admin-sidebar { padding: 1.5rem; }
+
+/* Login gate inside admin */
+.admin-login { padding: 3rem 2rem; text-align: center; }
+.admin-login h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
+.admin-login p { color: var(--muted); font-size: 0.83rem; margin-bottom: 1.5rem; }
+.admin-login input {
+  width: 100%; max-width: 280px; background: var(--card); border: 1px solid var(--border);
+  color: var(--text); padding: 0.75rem; border-radius: 8px; font-size: 0.95rem;
+  font-family: 'Outfit', sans-serif; outline: none; text-align: center;
+  letter-spacing: 3px; margin-bottom: 0.85rem; display: block; margin-left: auto; margin-right: auto;
+  transition: border-color 0.2s;
+}
+.admin-login input:focus { border-color: var(--accent); }
+.login-err { color: var(--danger); font-size: 0.8rem; margin-bottom: 0.7rem; display: none; }
+.login-hint { font-size: 0.72rem; color: var(--faint); margin-top: 0.8rem; }
+.login-hint strong { color: var(--accent); }
+
+/* Form fields */
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 0.4rem; }
+.field input, .field select, .field textarea {
+  width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text);
+  padding: 0.62rem 0.85rem; border-radius: 8px; font-size: 0.87rem;
+  font-family: 'Outfit', sans-serif; outline: none; transition: border-color 0.2s; resize: vertical;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field input::placeholder, .field textarea::placeholder { color: var(--muted); }
+.field select option { background: var(--card); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.field-hint { font-size: 0.71rem; color: var(--muted); margin-top: 0.32rem; }
+
+.emoji-row { display: flex; flex-wrap: wrap; gap: 0.38rem; margin-top: 0.4rem; }
+.em-opt { font-size: 1.3rem; cursor: pointer; padding: 0.27rem; border-radius: 6px; border: 2px solid transparent; transition: all 0.12s; line-height: 1; }
+.em-opt:hover { background: var(--tag); }
+.em-opt.on { border-color: var(--accent); background: rgba(212,168,67,0.1); }
+
+.form-btns { display: flex; gap: 0.6rem; margin-top: 1.2rem; }
+
+.btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1.1rem; border-radius: 8px; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 0.82rem; border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: all 0.18s; text-decoration: none; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn-save { background: var(--accent); border-color: var(--accent); color: #0c0b08; font-weight: 600; }
+.btn-save:hover { background: var(--warm); border-color: var(--warm); color: #0c0b08; }
+.btn-close { border-color: rgba(181,57,42,0.3); color: var(--danger); }
+.btn-close:hover { background: rgba(181,57,42,0.08); border-color: var(--danger); }
+.btn-logout { font-size: 0.75rem; border-color: rgba(181,57,42,0.25); color: var(--muted); }
+.btn-logout:hover { color: var(--danger); border-color: var(--danger); }
+
+/* Recipe list sidebar */
+.r-list { max-height: 400px; overflow-y: auto; }
+.r-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.65rem 0.7rem; border-radius: 8px; transition: background 0.14s; }
+.r-item:hover { background: var(--card); }
+.r-em { font-size: 1.4rem; flex-shrink: 0; }
+.r-info { flex: 1; min-width: 0; }
+.r-name { font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-meta { font-size: 0.7rem; color: var(--muted); margin-top: 0.05rem; }
+.r-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.8rem; padding: 0.25rem; border-radius: 4px; transition: all 0.12s; }
+.r-del:hover { color: var(--danger); }
+.r-empty { padding: 2rem 1rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
+.r-empty .re { font-size: 2rem; margin-bottom: 0.4rem; }
+
+.preview-box { margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid var(--border); display: none; }
+.prev-lbl { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 0.7rem; }
+.prev-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+.prev-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.22rem; }
+.prev-desc { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.65rem; }
+.prev-ings { display: flex; flex-wrap: wrap; gap: 0.32rem; margin-bottom: 0.65rem; }
+.prev-ing { background: var(--tag); border: 1px solid var(--border); padding: 0.16rem 0.5rem; border-radius: 4px; font-size: 0.74rem; }
+.prev-steps { list-style: none; }
+.prev-steps li { display: flex; gap: 0.6rem; margin-bottom: 0.45rem; font-size: 0.78rem; line-height: 1.5; }
+.pn { background: var(--accent); color: #0c0b08; font-weight: 700; font-size: 0.67rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+/* ── TOAST ───────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 2rem; left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--green); color: #fff;
+  padding: 0.72rem 1.4rem; border-radius: 999px;
+  font-weight: 500; font-size: 0.85rem; z-index: 9999;
+  transition: transform 0.28s ease; white-space: nowrap; pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.err { background: var(--danger); }
+
+/* ── MOBILE ──────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  nav { padding: 0 1rem; }
+  .nav-links, .nav-search-wrap { display: none; }
+  .nav-links.mob-open { display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--border); padding: 1rem; gap: 0.2rem; z-index: 499; }
+  .ham { display: flex; }
+  .hero { padding: 5rem 1.5rem 3rem; }
+  .hero-stats { gap: 2rem; }
+  .section { padding: 3rem 1.5rem; }
+  .meals-controls { padding: 0 1.5rem 1.5rem; }
+  .meal-grid { padding: 0 1.5rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .filter-strip.open { padding: 1rem 1.5rem; }
+  .modal-hd { padding: 1.5rem 1.2rem 1rem; }
+  .modal-bd { padding: 1rem 1.2rem 1.5rem; }
+  .admin-form { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ════════════════════════════════════════════════════════ -->
+<nav id="mainNav">
+  <div class="nav-logo" onclick="scrollToTop()">A Bachelor's Dish</div>
+  <div class="nav-links" id="navLinks">
+    <button class="nav-link active" onclick="scrollToMeals()">🍽 Recipes</button>
+    <button class="nav-link" onclick="scrollToAbout()">About</button>
+    <div class="nav-search-wrap">
+      <span class="nav-s-icon">🔍</span>
+      <input type="text" id="navSearch" placeholder="Search meals...">
+    </div>
+  </div>
+  <button class="ham" id="hamBtn" onclick="toggleMobileMenu()">☰</button>
+</nav>
+
+<!-- ══ HERO ═══════════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg"><div class="hero-grain"></div></div>
+  <div class="hero-eyebrow">🇰🇪 Kenyan Recipes</div>
+  <h1 class="hero-title">A Bachelor's<br><em>Dish</em></h1>
+  <p class="hero-tagline">Cook what you have. Eat well anyway.</p>
+  <div class="hero-actions">
+    <button class="btn-hero" onclick="scrollToMeals()">Browse Recipes →</button>
+    <button class="btn-hero-ghost" onclick="openIngFilter()">Filter by ingredients</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num" id="statMeals">20+</div><div class="stat-lbl">Recipes</div></div>
+    <div class="stat"><div class="stat-num">30+</div><div class="stat-lbl">Ingredients</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-lbl">Excuses</div></div>
+  </div>
+  <div class="scroll-hint">↓ scroll</div>
+</section>
+
+<!-- ══ INGREDIENT FILTER STRIP ═══════════════════════════════════ -->
+<div class="filter-strip" id="filterStrip">
+  <div class="filter-inner">
+    <div class="filter-head">
+      <h3>Tick what you have at home</h3>
+      <button class="clr-btn" id="clearChips">Clear all</button>
+    </div>
+    <div class="chip-row" id="chipRow"></div>
+  </div>
+</div>
+
+<!-- ══ MEALS ══════════════════════════════════════════════════════ -->
+<div id="meals-section">
+  <div class="meals-controls">
+    <div class="meals-left">
+      <h2 id="mealsTitle">All Recipes</h2>
+      <p id="mealsSub"></p>
+    </div>
+    <div class="meals-right">
+      <button class="btn-filter" id="filterBtn" onclick="toggleFilter()">🥬 Ingredients</button>
+    </div>
+  </div>
+  <div class="meal-grid" id="mealGrid"></div>
+  <div class="no-results" id="noResults" style="display:none">
+    <div class="nr-big">🍳</div>
+    <p style="color:var(--muted)">No meals found. Try different search or ingredients.</p>
+  </div>
+</div>
+
+<!-- ══ ABOUT ══════════════════════════════════════════════════════ -->
+<section id="about-section">
+  <div class="section">
+    <div class="about-grid">
+      <div class="about-visual">
+        <div class="about-ring">
+          <span class="about-center-em">🍲</span>
+        </div>
+        <div class="about-float af1">🥬 Sukuma wiki</div>
+        <div class="about-float af2">🫓 Ugali ready</div>
+        <div class="about-float af3">⏱ 30 min</div>
+      </div>
+      <div class="about-text">
+        <div class="section-eyebrow">About</div>
+        <h2 class="section-title">Built for the<br>everyday cook</h2>
+        <p class="section-sub">How many times have you stared at your kitchen, seen unga and sukuma wiki, and still gone to bed hungry because you didn't know what to make? That's exactly why this exists.</p>
+        <ul class="about-points">
+          <li>
+            <span class="ap-icon">🔍</span>
+            <div class="ap-text"><strong>Search by what you have</strong>Tick the ingredients sitting in your house right now and discover every meal you can already cook.</div>
+          </li>
+          <li>
+            <span class="ap-icon">📖</span>
+            <div class="ap-text"><strong>Clear, honest recipes</strong>Step-by-step instructions written plainly — no fancy equipment, no hard-to-find ingredients.</div>
+          </li>
+          <li>
+            <span class="ap-icon">🇰🇪</span>
+            <div class="ap-text"><strong>Kenyan through and through</strong>Ugali, pilau, githeri, matumbo — real food that Kenyans actually cook at home every day.</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">A Bachelor's Dish</div>
+  <div class="footer-tag">"Cook what you have. Eat well anyway."</div>
+  <div class="footer-note">Made with 🍳 for every Kenyan who has stared at their kitchen and given up.<br>No excuses. Just cook.</div>
+</footer>
+
+<!-- ══ RECIPE MODAL ═══════════════════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-hd">
+      <button class="modal-x" id="modalClose">✕</button>
+      <span class="modal-em" id="mEm"></span>
+      <div class="modal-title" id="mTitle"></div>
+      <div class="modal-sub" id="mSub"></div>
+      <div class="modal-tags" id="mTags"></div>
+    </div>
+    <div class="modal-bd">
+      <div class="sec-lbl">Ingredients</div>
+      <div class="ing-list" id="mIngs"></div>
+      <div class="sec-lbl">How to Cook</div>
+      <ol class="steps" id="mSteps"></ol>
+      <div class="src-note" id="mSrc" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL (secret) ════════════════════════════════════════ -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-panel">
+
+    <!-- Login gate -->
+    <div id="adminLogin">
+      <div class="admin-hd">
+        <h2>Admin Access</h2>
+        <button class="btn btn-close" onclick="closeAdmin()">✕ Close</button>
+      </div>
+      <div class="admin-login">
+        <h3>Enter Password</h3>
+        <p>This area is for the site owner only.</p>
+        <div class="login-err" id="loginErr">Wrong password. Try again.</div>
+        <input type="password" id="pwInput" placeholder="Password">
+        <button class="btn btn-save" style="margin:0 auto" onclick="doLogin()">Enter →</button>
+        <p class="login-hint">Default: <strong>bachelo2024</strong> — change it in the code</p>
+      </div>
+    </div>
+
+    <!-- Admin body -->
+    <div id="adminBody" style="display:none">
+      <div class="admin-hd">
+        <h2>⚙ Admin — Add Recipe</h2>
+        <div style="display:flex;gap:0.6rem">
+          <button class="btn btn-logout" onclick="doLogout()">Logout</button>
+          <button class="btn btn-close" onclick="closeAdmin()">✕ Close</button>
+        </div>
+      </div>
+      <div class="admin-inner">
+        <!-- FORM -->
+        <div class="admin-form">
+          <div class="field">
+            <label>Emoji</label>
+            <div class="emoji-row" id="emojiRow"></div>
+            <input type="text" id="eCustom" placeholder="Or type your own emoji" style="margin-top:0.45rem" maxlength="4">
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Meal Name *</label><input type="text" id="fName" placeholder="e.g. Matumbo na Ugali"></div>
+            <div class="field">
+              <label>Category *</label>
+              <select id="fCat">
+                <option value="">Select...</option>
+                <option>Staple</option><option>Stew</option><option>Rice dish</option>
+                <option>Bread</option><option>Grilled meat</option><option>Mash</option>
+                <option>Salad</option><option>Soup</option><option>Offal</option>
+                <option>Snack</option><option>Dessert</option><option>Drink</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Description *</label><input type="text" id="fDesc" placeholder="One sentence describing the dish"></div>
+          <div class="field-row">
+            <div class="field"><label>Cook Time</label><input type="text" id="fTime" placeholder="e.g. 45 min"></div>
+            <div class="field"><label>Serves</label><input type="text" id="fServes" placeholder="e.g. 4"></div>
+          </div>
+          <div class="field">
+            <label>Ingredients *</label>
+            <textarea id="fIngs" rows="4" placeholder="One per line:&#10;Unga wa mahindi&#10;Sukuma wiki&#10;Vitunguu"></textarea>
+            <div class="field-hint">Use Swahili names where possible.</div>
+          </div>
+          <div class="field">
+            <label>Cooking Steps *</label>
+            <textarea id="fSteps" rows="5" placeholder="One step per line:&#10;Boil 3 cups of water.&#10;Add unga slowly while stirring."></textarea>
+            <div class="field-hint">One action per step. Clear enough for a beginner.</div>
+          </div>
+          <div class="field">
+            <label>Source <span style="text-transform:none;letter-spacing:0;font-size:0.71rem">(optional)</span></label>
+            <input type="text" id="fSrcName" placeholder="e.g. Cookpad — Mama Njeri">
+            <input type="url" id="fSrcUrl" placeholder="https://cookpad.com/..." style="margin-top:0.45rem">
+          </div>
+          <div class="form-btns">
+            <button class="btn btn-save" onclick="saveRecipe()">✓ Save Recipe</button>
+            <button class="btn" onclick="clearForm()">Clear</button>
+          </div>
+          <div class="preview-box" id="prevBox">
+            <div class="prev-lbl">Live Preview</div>
+            <div class="prev-card" id="prevCard"></div>
+          </div>
+        </div>
+        <!-- SIDEBAR -->
+        <div class="admin-sidebar">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted)">Your Recipes</div>
+            <span style="font-size:0.78rem;color:var(--muted)"><em id="rCount" style="color:var(--accent);font-style:normal">0</em> saved</span>
+          </div>
+          <div class="r-list" id="rList"></div>
+          <div style="margin-top:1.2rem;padding:0.9rem;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:0.76rem;color:var(--muted);line-height:1.65">
+            <strong style="color:var(--text);display:block;margin-bottom:0.4rem">💡 Tips</strong>
+            Use Swahili ingredient names.<br>Keep steps short — one action each.<br>Mention amounts where helpful.<br>Reference Cookpad but rewrite in your own words.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// ADMIN PASSWORD — change this to something personal
+// ═══════════════════════════════════════════════════════════════
+const ADMIN_PASSWORD = "bachelo2024";
+
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const MEALS = [
+  { id:"b1", name:"Ugali na Sukuma Wiki", emoji:"🫓", category:"Staple", time:"30 min", serves:"4",
+    desc:"The ultimate Kenyan comfort meal — stiff maize porridge with braised collard greens",
+    ingredients:["Unga wa mahindi","Sukuma wiki","Vitunguu","Nyanya","Mafuta ya kupikia","Coriander"],
+    steps:["Bring 3 cups of water to a boil in a heavy pot. Add a pinch of salt.","Slowly add 2 cups unga wa mahindi, stirring constantly to avoid lumps.","Reduce heat, turn ugali firmly for 10–15 mins until it pulls from the pot sides. Rest 5 mins.","Heat oil, fry vitunguu golden, add nyanya and cook until soft.","Add sukuma wiki sliced thin, splash of water, cover and steam 5 minutes.","Season with salt, add coriander. Serve hot."]},
+  { id:"b2", name:"Pilau", emoji:"🍚", category:"Rice dish", time:"60 min", serves:"6",
+    desc:"Fragrant spiced rice slow-cooked with meat — a celebration dish from the Coast",
+    ingredients:["Mchele","Nyama ya ng'ombe","Vitunguu","Vitunguu saumu","Tangawizi","Bizari","Garam masala","Nyanya","Mafuta ya kupikia","Coriander"],
+    steps:["Wash and soak mchele 20 minutes. Drain.","Fry sliced vitunguu in oil until deep brown — this gives pilau its color.","Add vitunguu saumu and tangawizi, fry 2 mins. Add bizari and garam masala, stir 1 min.","Add nyama, brown all sides. Add nyanya, cook until sauce thickens.","Add 3 cups water, bring to boil, season with salt.","Add mchele, stir once, cover tightly, cook 20 mins on very low heat. Rest 5 mins."]},
+  { id:"b3", name:"Githeri", emoji:"🫘", category:"Stew", time:"90 min", serves:"5",
+    desc:"Boiled maize and beans — simple, filling, and nutritious. A true Kenyan classic",
+    ingredients:["Maharagwe","Ngano","Vitunguu","Nyanya","Mafuta ya kupikia","Vitunguu saumu","Coriander","Pilipili"],
+    steps:["Soak maharagwe and ngano separately overnight. Drain.","Boil maharagwe 30 mins. Add ngano, boil until tender (~40 more mins). Reserve some stock.","Heat oil, fry vitunguu soft. Add vitunguu saumu and nyanya into a thick sauce.","Add boiled githeri and some stock. Simmer 10 minutes.","Season with salt and pilipili. Garnish with coriander."]},
+  { id:"b4", name:"Mukimo", emoji:"🟢", category:"Mash", time:"45 min", serves:"4",
+    desc:"Creamy green mash of potatoes, peas, corn and spinach — a Kikuyu specialty",
+    ingredients:["Viazi","Mbaazi","Ngano","Spinachi","Vitunguu","Siagi"],
+    steps:["Boil viazi, mbaazi, and ngano in salted water until very soft (~25 mins).","Add spinachi in last 5 minutes to wilt.","Drain. Mash everything together while hot.","Add siagi and a splash of milk. Mash until smooth and green.","Fry vitunguu until caramelized, stir into mash. Season well."]},
+  { id:"b5", name:"Chapati", emoji:"🫓", category:"Bread", time:"40 min", serves:"6",
+    desc:"Soft, layered flatbread — perfect with stew, beans, or just chai",
+    ingredients:["Unga wa ngano","Mafuta ya kupikia","Siagi"],
+    steps:["Mix unga with salt. Add warm water gradually, knead into smooth soft dough.","Rest dough covered 20 minutes.","Divide into balls. Roll flat, brush oil. Roll into a log, coil into a spiral, re-roll flat.","Cook on dry hot pan 1–2 mins per side until brown spots appear.","Brush with siagi while cooking. Keep warm wrapped in a cloth."]},
+  { id:"b6", name:"Nyama Choma", emoji:"🍖", category:"Grilled meat", time:"90 min", serves:"4",
+    desc:"Fire-roasted meat — Kenya's national dish, best eaten with bare hands and cold drinks",
+    ingredients:["Nyama ya ng'ombe","Vitunguu","Nyanya","Pilipili","Coriander","Tangawizi","Vitunguu saumu"],
+    steps:["Season meat with salt, pilipili, and lemon. Marinate at least 30 minutes.","Light charcoal, wait for white-hot embers — no open flame.","Grill meat, turning every 10 minutes. Don't press down.","Cook 45–60 minutes until charred outside, cooked through.","Make kachumbari: dice nyanya and vitunguu, add pilipili and coriander.","Serve with kachumbari and ugali. Pull apart with your hands."]},
+  { id:"b7", name:"Maharagwe ya Nazi", emoji:"🥥", category:"Stew", time:"60 min", serves:"4",
+    desc:"Creamy coconut bean stew — a coastal classic that is rich, fragrant and comforting",
+    ingredients:["Maharagwe","Coconut milk","Vitunguu","Nyanya","Vitunguu saumu","Tangawizi","Bizari","Mafuta ya kupikia","Coriander"],
+    steps:["Soak maharagwe overnight. Boil until tender (~45 mins). Drain.","Heat oil, fry vitunguu. Add vitunguu saumu, tangawizi, and bizari.","Add nyanya, cook until soft. Add maharagwe and stir.","Pour in coconut milk, simmer 15 minutes until sauce thickens.","Season, garnish with coriander. Serve with chapati or rice."]},
+  { id:"b8", name:"Dengu", emoji:"🟡", category:"Stew", time:"40 min", serves:"4",
+    desc:"Lentil stew cooked with spices and coconut — simple, fast, and deeply satisfying",
+    ingredients:["Dengu","Vitunguu","Nyanya","Vitunguu saumu","Tangawizi","Coconut milk","Mafuta ya kupikia","Coriander","Bizari"],
+    steps:["Wash and soak dengu 20 minutes. Boil until soft (~20 mins).","Heat oil, fry vitunguu golden. Add vitunguu saumu, tangawizi, and bizari.","Add nyanya and cook into sauce. Add dengu, stir.","Pour in coconut milk, simmer 10 minutes. Season.","Garnish with coriander. Serve with chapati, rice, or ugali."]},
+  { id:"b9", name:"Kachumbari", emoji:"🥗", category:"Salad", time:"10 min", serves:"4",
+    desc:"Fresh tomato and onion salad — the brightest side dish on any Kenyan table",
+    ingredients:["Nyanya","Vitunguu","Pilipili","Coriander"],
+    steps:["Dice nyanya into small cubes. Slice vitunguu very thinly.","Soak vitunguu in cold salted water 5 minutes. Drain.","Combine nyanya and vitunguu. Add finely chopped pilipili.","Add fresh coriander and a squeeze of lemon. Season with salt.","Mix gently, taste, adjust. Serve immediately."]},
+  { id:"b10", name:"Ugali ya Wimbi", emoji:"🌾", category:"Staple", time:"25 min", serves:"4",
+    desc:"Dark, nutty finger millet ugali — a nutrient-dense traditional alternative",
+    ingredients:["Wimbi","Sukuma wiki","Mafuta ya kupikia","Vitunguu","Nyanya"],
+    steps:["Bring 2.5 cups water to boil. Mix 2 cups wimbi flour with cold water into a paste.","Pour paste into boiling water, stirring quickly.","Stir on low heat 15 minutes — wimbi ugali is denser than maize ugali.","Ready when it comes away from pot sides cleanly.","Serve with sukuma wiki or sour milk (mala)."]},
+  { id:"b11", name:"Matumbo", emoji:"🫀", category:"Offal", time:"75 min", serves:"4",
+    desc:"Tender tripe slow-cooked in a bold tomato sauce — a true Nairobi street classic",
+    ingredients:["Nyama ya ng'ombe","Vitunguu","Nyanya","Vitunguu saumu","Tangawizi","Pilipili","Garam masala","Mafuta ya kupikia","Coriander"],
+    steps:["Clean tripe thoroughly. Rub with lemon juice and salt, rinse well.","Boil tripe in salted water with tangawizi for 40–50 minutes until tender. Drain and chop.","Heat oil, fry vitunguu until golden. Add vitunguu saumu and tangawizi paste.","Add nyanya, cook until broken down. Add garam masala and pilipili.","Add boiled tripe, stir to coat. Add a cup of water, simmer 15 minutes.","Garnish with coriander. Serve with ugali."]},
+  { id:"b12", name:"Wali wa Nazi", emoji:"🌴", category:"Rice dish", time:"35 min", serves:"4",
+    desc:"Fragrant coconut rice from the Kenyan coast — subtly sweet and deeply aromatic",
+    ingredients:["Mchele","Coconut milk","Vitunguu","Vitunguu saumu","Tangawizi","Mafuta ya kupikia"],
+    steps:["Wash mchele until water runs clear. Soak 15 minutes.","Heat oil, fry vitunguu. Add vitunguu saumu and tangawizi.","Add drained mchele, stir to coat 2 minutes.","Pour in 1 can coconut milk plus 1 cup water. Add salt.","Bring to boil, reduce to very low, cover tightly and cook 20 minutes.","Turn off heat. Do not open lid 5 minutes. Fluff and serve."]},
+  { id:"b13", name:"Samaki wa Kupaka", emoji:"🐟", category:"Stew", time:"50 min", serves:"4",
+    desc:"Coastal fish grilled then simmered in a rich spiced coconut sauce",
+    ingredients:["Samaki","Coconut milk","Nyanya","Vitunguu","Vitunguu saumu","Tangawizi","Bizari","Pilipili hoho","Mafuta ya kupikia","Coriander"],
+    steps:["Season fish with salt, lemon, and pilipili. Let it sit 15 minutes.","Grill or pan-fry fish until golden on both sides. Set aside.","In a pan, heat oil. Fry vitunguu, add vitunguu saumu and tangawizi.","Add bizari, nyanya, and pilipili hoho. Cook until sauce is thick.","Pour in coconut milk, stir and simmer 8 minutes.","Add fish gently, spoon sauce over it. Simmer 5 more minutes. Garnish with coriander."]},
+  { id:"b14", name:"Mahindi Choma", emoji:"🌽", category:"Snack", time:"20 min", serves:"2",
+    desc:"Roasted maize rubbed with lemon and chili — the ultimate Kenyan street snack",
+    ingredients:["Ngano","Pilipili","Coriander"],
+    steps:["Peel back husks without removing. Remove the silk threads inside.","Roast maize directly over charcoal or on a gas flame, turning regularly.","Cook 15–20 minutes, rotating every few minutes for even char.","Mix lemon juice with pilipili powder and salt in a small bowl.","Rub the lemon-chili mix all over the hot maize.","Eat immediately while hot."]},
+  { id:"b15", name:"Mandazi", emoji:"🍩", category:"Snack", time:"45 min", serves:"8",
+    desc:"Fluffy fried dough with a hint of coconut and cardamom — perfect with chai",
+    ingredients:["Unga wa ngano","Coconut milk","Mayai","Siagi","Bizari"],
+    steps:["Mix unga, 2 tbsp sugar, 1 tsp cardamom (bizari), and a pinch of salt.","Add 1 egg, 2 tbsp siagi, and enough coconut milk to make a soft dough.","Knead until smooth. Rest covered for 20 minutes.","Roll dough to 1cm thickness. Cut into triangles or circles.","Deep fry in hot oil on medium heat, turning once, until golden brown.","Drain on paper. Serve warm with chai."]},
+  { id:"b16", name:"Viazi Karai", emoji:"🥔", category:"Snack", time:"30 min", serves:"4",
+    desc:"Crispy spiced potatoes fried in batter — a favorite Mombasa street food",
+    ingredients:["Viazi","Unga wa ngano","Pilipili","Tangawizi","Bizari","Mafuta ya kupikia"],
+    steps:["Boil viazi until just tender — not too soft. Peel and halve.","Make a spiced batter: mix unga, pilipili, tangawizi, bizari, and salt with water until thick.","Heat oil in a deep pan on medium-high.","Dip each potato half in the batter, coating well.","Fry until the batter is golden and crispy, about 4–5 minutes.","Drain and serve hot with tamarind or chili sauce."]},
+  { id:"b17", name:"Nyama ya Kuku", emoji:"🍗", category:"Stew", time:"55 min", serves:"4",
+    desc:"Tender chicken in a deep tomato and onion stew — simple, rich and satisfying",
+    ingredients:["Nyama ya kuku","Vitunguu","Nyanya","Vitunguu saumu","Tangawizi","Garam masala","Mafuta ya kupikia","Coriander"],
+    steps:["Clean and cut chicken into pieces. Season with salt and pilipili.","Heat oil in a heavy pot. Brown chicken pieces on all sides. Remove and set aside.","In the same pot, fry vitunguu until dark golden.","Add vitunguu saumu and tangawizi. Fry 2 minutes. Add garam masala.","Add nyanya and cook into a thick sauce. Return chicken to pot.","Add half a cup water, cover and simmer 25 minutes. Garnish with coriander."]},
+  { id:"b18", name:"Kunde", emoji:"🌿", category:"Stew", time:"60 min", serves:"4",
+    desc:"Cowpea leaves cooked in coconut milk — a forgotten Kenyan green that deserves more love",
+    ingredients:["Sukuma wiki","Coconut milk","Vitunguu","Nyanya","Vitunguu saumu","Mafuta ya kupikia"],
+    steps:["Wash the kunde (cowpea leaves) well and chop roughly.","Heat oil, fry vitunguu soft. Add vitunguu saumu.","Add nyanya, cook until soft.","Add the kunde leaves and stir well to coat in the sauce.","Pour in half a cup coconut milk. Cover and simmer 15 minutes.","Season with salt. Serve with ugali."]},
+  { id:"b19", name:"Mayai Pasua", emoji:"🍳", category:"Snack", time:"15 min", serves:"2",
+    desc:"Split boiled eggs pan-fried with spiced onions and tomato — quick, filling, and tasty",
+    ingredients:["Mayai","Vitunguu","Nyanya","Pilipili","Mafuta ya kupikia","Coriander"],
+    steps:["Hard boil eggs (8–10 minutes). Peel and cut in half lengthwise.","Heat oil in a pan. Fry vitunguu until golden.","Add nyanya and pilipili. Cook 3 minutes into a quick sauce.","Place egg halves cut-side down into the sauce. Cook 2 minutes.","Flip gently. Spoon sauce over the eggs.","Garnish with coriander. Serve with chapati or bread."]},
+  { id:"b20", name:"Irio", emoji:"🥦", category:"Mash", time:"35 min", serves:"4",
+    desc:"Potato and green mash from Central Kenya — hearty, herby and packed with vegetables",
+    ingredients:["Viazi","Mbaazi","Sukuma wiki","Vitunguu","Siagi"],
+    steps:["Boil viazi and mbaazi together in salted water until soft.","Add sukuma wiki in the last 5 minutes to wilt.","Drain and mash everything together while hot.","Add siagi and mash until smooth with flecks of green.","Fry vitunguu until caramelized, fold into the mash.","Season well. Serve with nyama choma or stew."]}
+];
+
+const ALL_INGREDIENTS = [
+  "Unga wa mahindi","Unga wa ngano","Mchele","Ngano","Viazi",
+  "Nyanya","Vitunguu","Pilipili hoho","Nyama ya ng'ombe","Nyama ya kuku",
+  "Samaki","Mayai","Maharagwe","Mbaazi","Dengu","Wimbi",
+  "Sukuma wiki","Spinachi","Kabichi","Karoti","Coconut milk",
+  "Siagi","Mafuta ya kupikia","Vitunguu saumu","Tangawizi",
+  "Pilipili","Bizari","Garam masala","Coriander","Avocado"
+];
+
+const EMOJIS = ["🍚","🫓","🥘","🍖","🥗","🫘","🥥","🟢","🟡","🌾","🐟","🥩","🍳","🫕","🌽","🥬","🍲","🫙","🍗","🥔"];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+let selIngs = new Set();
+let searchQ = "";
+let selEmoji = EMOJIS[0];
+let filterOpen = false;
+let mobMenuOpen = false;
+
+// ═══════════════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener("scroll", () => {
+  document.getElementById("mainNav").classList.toggle("scrolled", window.scrollY > 10);
+});
+
+function scrollToTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
+function scrollToMeals() { document.getElementById("meals-section").scrollIntoView({ behavior: "smooth" }); }
+function scrollToAbout() { document.getElementById("about-section").scrollIntoView({ behavior: "smooth" }); }
+
+function toggleMobileMenu() {
+  mobMenuOpen = !mobMenuOpen;
+  document.getElementById("navLinks").classList.toggle("mob-open", mobMenuOpen);
+}
+
+document.getElementById("navSearch").addEventListener("input", function() {
+  searchQ = this.value.toLowerCase().trim();
+  renderMeals();
+  if (searchQ) scrollToMeals();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// INGREDIENT FILTER
+// ═══════════════════════════════════════════════════════════════
+const chipRow = document.getElementById("chipRow");
+ALL_INGREDIENTS.forEach(ing => {
+  const c = document.createElement("div");
+  c.className = "chip"; c.textContent = ing;
+  c.addEventListener("click", () => {
+    selIngs.has(ing) ? (selIngs.delete(ing), c.classList.remove("on"))
+                     : (selIngs.add(ing), c.classList.add("on"));
+    renderMeals();
+  });
+  chipRow.appendChild(c);
+});
+
+document.getElementById("clearChips").addEventListener("click", () => {
+  selIngs.clear();
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("on"));
+  renderMeals();
+});
+
+function toggleFilter() {
+  filterOpen = !filterOpen;
+  document.getElementById("filterStrip").classList.toggle("open", filterOpen);
+  document.getElementById("filterBtn").classList.toggle("active", filterOpen);
+}
+
+function openIngFilter() {
+  scrollToMeals();
+  setTimeout(() => {
+    filterOpen = true;
+    document.getElementById("filterStrip").classList.add("open");
+    document.getElementById("filterBtn").classList.add("active");
+  }, 600);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MEALS
+// ═══════════════════════════════════════════════════════════════
+function getUserMeals() {
+  try { return JSON.parse(localStorage.getItem("abd_meals") || "[]"); } catch { return []; }
+}
+
+function scoreMatch(meal) {
+  if (!selIngs.size) return { n: meal.ingredients.length, have: [], miss: [] };
+  const have = meal.ingredients.filter(i =>
+    [...selIngs].some(s => i.toLowerCase().includes(s.toLowerCase()) || s.toLowerCase().includes(i.toLowerCase().split(" ")[0]))
+  );
+  return { n: have.length, have, miss: meal.ingredients.filter(i => !have.includes(i)) };
+}
+
+function renderMeals() {
+  const grid = document.getElementById("mealGrid");
+  const noRes = document.getElementById("noResults");
+  const title = document.getElementById("mealsTitle");
+  const sub = document.getElementById("mealsSub");
+  const hasF = selIngs.size > 0;
+  const userIds = new Set(getUserMeals().map(m => m.id));
+  const allMeals = [...MEALS, ...getUserMeals()];
+
+  let meals = allMeals.filter(m => {
+    if (!searchQ) return true;
+    return m.name.toLowerCase().includes(searchQ) ||
+           m.desc.toLowerCase().includes(searchQ) ||
+           m.category.toLowerCase().includes(searchQ) ||
+           m.ingredients.some(i => i.toLowerCase().includes(searchQ));
+  });
+
+  if (hasF) {
+    meals.sort((a,b) => scoreMatch(b).n - scoreMatch(a).n);
+    title.textContent = "Meals you can cook";
+    const perfect = meals.filter(m => !scoreMatch(m).miss.length).length;
+    sub.innerHTML = `<em>${perfect}</em> full matches from your ingredients`;
+  } else {
+    title.textContent = searchQ ? `Results for "${searchQ}"` : "All Recipes";
+    const uCount = meals.filter(m => userIds.has(m.id)).length;
+    sub.innerHTML = `<em>${meals.length}</em> recipes${uCount ? ` · <em>${uCount}</em> added by you` : ""}`;
+  }
+
+  // Update hero stat
+  document.getElementById("statMeals").textContent = allMeals.length + "+";
+
+  grid.innerHTML = "";
+  if (!meals.length) { noRes.style.display = "block"; return; }
+  noRes.style.display = "none";
+
+  meals.forEach((meal, idx) => {
+    const { n, have, miss } = scoreMatch(meal);
+    const isUser = userIds.has(meal.id);
+    const card = document.createElement("div");
+    card.className = "meal-card" + (hasF && n === 0 ? " dim" : "");
+    card.style.animationDelay = Math.min(idx * 0.04, 0.4) + "s";
+
+    let badges = "";
+    if (hasF) {
+      if (!miss.length) badges += `<span class="ctag-match">✓ Full match</span>`;
+      else if (n > 0) badges += `<span class="ctag-match">Missing ${miss.length}</span>`;
+    }
+    if (isUser) badges += `<span class="ctag-user">✦ Yours</span>`;
+
+    card.innerHTML = `
+      <div class="card-top"><span class="card-em">${meal.emoji}</span></div>
+      <div class="card-body">
+        <div class="card-name">${meal.name}</div>
+        <div class="card-desc">${meal.desc}</div>
+        <div class="card-foot">
+          <span class="ctag">⏱ ${meal.time}</span>
+          <span class="ctag">👥 ${meal.serves}</span>
+          <span class="ctag">${meal.category}</span>
+          ${badges}
+        </div>
+      </div>`;
+    card.addEventListener("click", () => openModal(meal, have));
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════
+function openModal(meal, haveList = []) {
+  document.getElementById("mEm").textContent = meal.emoji;
+  document.getElementById("mTitle").textContent = meal.name;
+  document.getElementById("mSub").textContent = meal.desc;
+  document.getElementById("mTags").innerHTML =
+    `<span class="ctag">⏱ ${meal.time}</span><span class="ctag">👥 Serves ${meal.serves}</span><span class="ctag">${meal.category}</span>`;
+  document.getElementById("mIngs").innerHTML =
+    meal.ingredients.map(i => `<span class="ing-pill ${haveList.includes(i)?"have":""}">${haveList.includes(i)?"✓ ":""}${i}</span>`).join("");
+  document.getElementById("mSteps").innerHTML =
+    meal.steps.map((s,i)=>`<li><span class="snum">${i+1}</span><span class="stxt">${s}</span></li>`).join("");
+  const src = document.getElementById("mSrc");
+  if (meal.source) { src.innerHTML=`📖 Source: <a href="${meal.source}" target="_blank">${meal.sourceName||meal.source}</a>`; src.style.display="block"; }
+  else src.style.display="none";
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("overlay").addEventListener("click", e => { if(e.target.id==="overlay") closeModal(); });
+document.addEventListener("keydown", e => { if(e.key==="Escape"){ closeModal(); closeAdmin(); } });
+function closeModal() { document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; }
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN — triggered by URL hash #admin or ?admin
+// ═══════════════════════════════════════════════════════════════
+function checkAdminTrigger() {
+  if (window.location.search.includes("admin") || window.location.hash === "#admin") {
+    openAdmin();
+    // Clean URL so it's not visible
+    history.replaceState(null, "", window.location.pathname);
+  }
+}
+
+function openAdmin() {
+  const authed = sessionStorage.getItem("abd_admin");
+  document.getElementById("adminLogin").style.display = authed ? "none" : "block";
+  document.getElementById("adminBody").style.display = authed ? "block" : "none";
+  document.getElementById("adminOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  if (authed) { loadRecipeList(); setupPreview(); }
+}
+
+function closeAdmin() {
+  document.getElementById("adminOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("pwInput").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+
+function doLogin() {
+  if (document.getElementById("pwInput").value === ADMIN_PASSWORD) {
+    sessionStorage.setItem("abd_admin","1");
+    document.getElementById("loginErr").style.display = "none";
+    document.getElementById("adminLogin").style.display = "none";
+    document.getElementById("adminBody").style.display = "block";
+    loadRecipeList();
+    setupPreview();
+  } else {
+    document.getElementById("loginErr").style.display = "block";
+    document.getElementById("pwInput").value = "";
+    document.getElementById("pwInput").focus();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem("abd_admin");
+  document.getElementById("adminBody").style.display = "none";
+  document.getElementById("adminLogin").style.display = "block";
+  document.getElementById("pwInput").value = "";
+}
+
+// Emoji row
+const emojiRow = document.getElementById("emojiRow");
+EMOJIS.forEach((em, i) => {
+  const btn = document.createElement("span");
+  btn.className = "em-opt" + (i===0?" on":"");
+  btn.textContent = em;
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".em-opt").forEach(b=>b.classList.remove("on"));
+    btn.classList.add("on"); selEmoji = em;
+    document.getElementById("eCustom").value = "";
+    updatePreview();
+  });
+  emojiRow.appendChild(btn);
+});
+
+document.getElementById("eCustom").addEventListener("input", function() {
+  if (this.value.trim()) {
+    selEmoji = this.value.trim();
+    document.querySelectorAll(".em-opt").forEach(b=>b.classList.remove("on"));
+    updatePreview();
+  }
+});
+
+let prevSetup = false;
+function setupPreview() {
+  if (prevSetup) return; prevSetup = true;
+  ["fName","fDesc","fIngs","fSteps","fCat","fTime","fServes"].forEach(id => {
+    document.getElementById(id).addEventListener("input", updatePreview);
+  });
+}
+
+function updatePreview() {
+  const name = document.getElementById("fName").value.trim();
+  const desc = document.getElementById("fDesc").value.trim();
+  const ings = document.getElementById("fIngs").value.trim().split("\n").filter(Boolean);
+  const steps = document.getElementById("fSteps").value.trim().split("\n").filter(Boolean);
+  const box = document.getElementById("prevBox");
+  if (!name && !desc) { box.style.display="none"; return; }
+  box.style.display = "block";
+  document.getElementById("prevCard").innerHTML = `
+    <div style="font-size:1.8rem;margin-bottom:0.35rem">${selEmoji}</div>
+    <div class="prev-title">${name||"Recipe Name"}</div>
+    <div class="prev-desc">${desc||"Description..."}</div>
+    ${ings.length?`<div class="prev-ings">${ings.map(i=>`<span class="prev-ing">${i}</span>`).join("")}</div>`:""}
+    ${steps.length?`<ol class="prev-steps">${steps.map((s,i)=>`<li><span class="pn">${i+1}</span>${s}</li>`).join("")}</ol>`:""}
+  `;
+}
+
+function saveRecipe() {
+  const name  = document.getElementById("fName").value.trim();
+  const desc  = document.getElementById("fDesc").value.trim();
+  const cat   = document.getElementById("fCat").value;
+  const time  = document.getElementById("fTime").value.trim() || "?";
+  const serves= document.getElementById("fServes").value.trim() || "?";
+  const ings  = document.getElementById("fIngs").value.trim().split("\n").filter(Boolean);
+  const steps = document.getElementById("fSteps").value.trim().split("\n").filter(Boolean);
+  const snm   = document.getElementById("fSrcName").value.trim();
+  const surl  = document.getElementById("fSrcUrl").value.trim();
+
+  if (!name)  return toast("Please add a meal name", true);
+  if (!desc)  return toast("Please add a description", true);
+  if (!cat)   return toast("Please select a category", true);
+  if (ings.length < 2)  return toast("Add at least 2 ingredients", true);
+  if (steps.length < 2) return toast("Add at least 2 steps", true);
+
+  const meal = { id:"u_"+Date.now(), name, desc, category:cat, time, serves, emoji:selEmoji, ingredients:ings, steps, sourceName:snm||null, source:surl||null };
+  const saved = getUserMeals();
+  saved.push(meal);
+  localStorage.setItem("abd_meals", JSON.stringify(saved));
+  toast(`✓ "${name}" saved!`);
+  clearForm();
+  loadRecipeList();
+  renderMeals();
+}
+
+function loadRecipeList() {
+  const meals = getUserMeals();
+  document.getElementById("rCount").textContent = meals.length;
+  const list = document.getElementById("rList");
+  if (!meals.length) {
+    list.innerHTML = `<div class="r-empty"><div class="re">📭</div>No recipes yet.</div>`;
+    return;
+  }
+  list.innerHTML = meals.slice().reverse().map(m=>`
+    <div class="r-item">
+      <span class="r-em">${m.emoji}</span>
+      <div class="r-info">
+        <div class="r-name">${m.name}</div>
+        <div class="r-meta">${m.category} · ${m.ingredients.length} ings · ${m.steps.length} steps</div>
+      </div>
+      <button class="r-del" onclick="deleteRecipe('${m.id}')">🗑</button>
+    </div>`).join("");
+}
+
+function deleteRecipe(id) {
+  if (!confirm("Delete this recipe?")) return;
+  localStorage.setItem("abd_meals", JSON.stringify(getUserMeals().filter(m=>m.id!==id)));
+  loadRecipeList(); renderMeals(); toast("Deleted");
+}
+
+function clearForm() {
+  ["fName","fDesc","fTime","fServes","fIngs","fSteps","fSrcName","fSrcUrl","eCustom"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("fCat").value="";
+  document.querySelectorAll(".em-opt").forEach((b,i)=>b.classList.toggle("on",i===0));
+  selEmoji = EMOJIS[0];
+  document.getElementById("prevBox").style.display="none";
+}
+
+function toast(msg, isErr=false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast" + (isErr?" err":"");
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+renderMeals();
+checkAdminTrigger();
+</script>
+</body>
+</html>
